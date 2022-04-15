@@ -8,42 +8,62 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
-var request = require("request"); // "Request" library
-
+var axios = require("axios");
+var qs = require("qs");
+require("dotenv").config();
 // Client ID 4d1a89c59c9c493a870c646af5bde69d
 // Client Secret 6294aabd768f4ab087ba2d16ae85d6fd
 
-var client_id = "4d1a89c59c9c493a870c646af5bde69d"; // Your client id
-var client_secret = "6294aabd768f4ab087ba2d16ae85d6fd"; // Your secret
-var authOptions = {
-  url: "https://accounts.spotify.com/api/token",
-  headers: {
-    Authorization:
-      "Basic " +
-      Buffer.from(client_id + ":" + client_secret).toString("base64"),
-  },
-  form: {
-    grant_type: "client_credentials",
-  },
-  json: true,
+const client_id = process.env.SPOTIFY_API_ID; // Your client id
+const client_secret = process.env.SPOTIFY_CLIENT_SECRET; // Your secret
+const auth_token = Buffer.from(
+  `${client_id}:${client_secret}`,
+  "utf-8"
+).toString("base64");
+
+const getAuth = async () => {
+  try {
+    //make post request to SPOTIFY API for access token, sending relavent info
+    const token_url = "https://accounts.spotify.com/api/token";
+    const data = qs.stringify({ grant_type: "client_credentials" });
+
+    const response = await axios.post(token_url, data, {
+      headers: {
+        Authorization: `Basic ${auth_token}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    //return access token
+    return response.data.access_token;
+    //console.log(response.data.access_token);
+  } catch (error) {
+    //on fail, log the error in console
+    console.log("ERROR-AUTH", error);
+  }
 };
 
-request.post(authOptions, function (error, response, body) {
-  if (!error && response.statusCode === 200) {
-    // use the access token to access the Spotify Web API
-    var token = body.access_token;
-    var options = {
-      url: "https://api.spotify.com/v1/users/jmperezperez",
+const getAudioFeatures_Track = async (track_id) => {
+  //request token using getAuth() function
+  const access_token = await getAuth();
+  console.log(access_token);
+
+  const api_url = `https://api.spotify.com/v1/search?q=Bak&type=artist&limit=10`;
+  // console.log(api_url);
+  try {
+    const response = await axios.get(api_url, {
       headers: {
-        Authorization: "Bearer " + token,
+        Authorization: `Bearer ${access_token}`,
+        "Content-Type": "application/json",
       },
-      json: true,
-    };
-    request.get(options, function (error, response, body) {
-      console.log(body);
     });
+    console.log(response.data.artists.items);
+    return response.data;
+  } catch (error) {
+    console.log("GetArtistsError : ", error);
   }
-});
+};
+
+console.log(getAudioFeatures_Track("07A0whlnYwfWfLQy4qh3Tq"));
 
 // view engine setup 
 
