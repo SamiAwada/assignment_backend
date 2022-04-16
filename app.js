@@ -8,7 +8,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
-
+app.set("view engine", "html");
 // const getAudioFeatures_Track = async (track_id) => {
 //   //request token using getAuth() function
 //   const access_token = await getAuth();
