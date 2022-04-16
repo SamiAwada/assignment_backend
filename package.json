@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon --watch ./views --watch ./routes --watch ./app.js  --ignore ./.git --ignore ./node_modules ./app.js"
+    "start": "nodemon ./app.js --legacy-watch"
   },
   "dependencies": {
     "axios": "^0.26.1",
