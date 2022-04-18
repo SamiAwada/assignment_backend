@@ -23,7 +23,6 @@ module.exports = {
           },
         })
         .then((response) => {
-          console.log("Token :", response.data.access_token);
           req.body.spotToken = response.data.access_token;
           next();
         })
