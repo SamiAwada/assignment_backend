@@ -1,11 +1,13 @@
 var express = require("express");
 var axios = require("axios");
+var ArtistsSearchResult = require("../src/modules/artistSearchResult");
 const { getToken } = require("../src/middlewares/spotifyToken");
 var router = express.Router();
+var mongo = require("../src/db/mongooseDB");
 
 router.post("/", [getToken], async function (req, res, next) {
+  mongo.open();
   const access_token = req.body.spotToken;
-
   const name = req.body.searchText;
   const PageValue = req.body.PageValue;
 
@@ -34,11 +36,20 @@ router.post("/", [getToken], async function (req, res, next) {
         };
       }),
     };
+
+    console.log("artists:", searchResult.artists);
+    const searchResultDB = new ArtistsSearchResult({
+      searchText: name,
+      searchResult: searchResult.artists,
+    });
+    searchResultDB.save();
+    mongo.close();
     console.log(searchResult);
     res.send(searchResult);
   } catch (error) {
     console.log("GetArtistsError : ", error);
   }
+  console.log("Finished Him");
 });
 
 module.exports = router;
