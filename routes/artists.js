@@ -6,11 +6,9 @@ var router = express.Router();
 var mongo = require("../src/db/mongooseDB");
 
 router.post("/", [getToken], async function (req, res, next) {
-  mongo.open();
   const access_token = req.body.spotToken;
   const name = req.body.searchText;
   const PageValue = req.body.PageValue;
-
   const api_url =
     "https://api.spotify.com/v1/search?q=" +
     name +
@@ -19,6 +17,7 @@ router.post("/", [getToken], async function (req, res, next) {
     "&limit=5";
 
   try {
+    mongo.open();
     const response = await axios.get(api_url, {
       headers: {
         Authorization: `Bearer ${access_token}`,
@@ -37,19 +36,16 @@ router.post("/", [getToken], async function (req, res, next) {
       }),
     };
 
-    console.log("artists:", searchResult.artists);
     const searchResultDB = new ArtistsSearchResult({
       searchText: name,
       searchResult: searchResult.artists,
     });
-    searchResultDB.save();
+    await searchResultDB.save();
     mongo.close();
-    console.log(searchResult);
     res.send(searchResult);
   } catch (error) {
     console.log("GetArtistsError : ", error);
   }
-  console.log("Finished Him");
 });
 
 module.exports = router;

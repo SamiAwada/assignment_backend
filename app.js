@@ -1,30 +1,22 @@
-var createError = require('http-errors');
-var express = require('express');
+// var createError = require('http-errors');
+var express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser")
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-
+const bodyParser = require("body-parser");
+var path = require("path");
+// var cookieParser = require("cookie-parser");
+// var logger = require("morgan");
 var indexRouter = require("./routes/artists");
-var usersRouter = require('./routes/users');
 
 var app = express();
 app.set("view engine", "html");
 
 
-// console.log(getAudioFeatures_Track("07A0whlnYwfWfLQy4qh3Tq"));
-
-// view engine setup 
+// view engine setup
 app.use(cors("http://localhost:4200/"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 
 app.use("/artists", indexRouter);
-app.use("/users", usersRouter);
-
 
 app.listen(3000, () => {
   console.log("server on port 3000");
