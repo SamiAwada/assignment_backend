@@ -48,4 +48,15 @@ router.post("/", [getToken], async function (req, res, next) {
   }
 });
 
+router.get("/uniquesearches", async (req, res) => {
+  const searchText = req.query.searchText;
+  console.log(searchText);
+  try {
+    mongo.open();
+    mongo.close();
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 module.exports = router;
