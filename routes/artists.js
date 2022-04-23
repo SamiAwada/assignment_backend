@@ -49,10 +49,44 @@ router.post("/", [getToken], async function (req, res, next) {
 });
 
 router.get("/uniquesearches", async (req, res) => {
+  const pagevalue = req.query.pagevalue;
   const searchText = req.query.searchText;
-  console.log(searchText);
+  const page = pagevalue;
+  const startIndex = page * 5;
+  console.log("req.query:", req.query);
   try {
-    mongo.open();
+    await mongo.open();
+    let docs = await ArtistsSearchResult.aggregate([
+      { "$match": { "searchText": { "$regex": searchText } } },
+      { "$unwind": "$searchResult" },
+      {
+        "$group": {
+          "_id": "null",
+          "searches": { "$addToSet": "$searchText" },
+          "searchResult": { "$addToSet": "$searchResult" },
+        },
+      },
+      {
+        "$project": {
+          "artists": { "$slice": ["$searchResult", startIndex, 5] },
+          "searches": "$searches",
+          "artistsnb": { "$size": "$searchResult" },
+        },
+      },
+      // {
+      //   "$project": {
+      //     "artists": {"a":"$artists"},
+      //     "searches": "$searches",
+      //     "artistsnb": {"$size": "$searchResult"}
+      //   }
+      // }
+    ]);
+    console.log("docs:", docs);
+    docs[0].artists.map((ele) => {
+      return console.log("ele: ", ele);
+    });
+    res.send(docs);
+    // console.log("docs.searchResult:", docs[0].searchResult.map(ele => return cos));
     mongo.close();
   } catch (error) {
     console.log(error);

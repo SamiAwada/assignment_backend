@@ -12,7 +12,7 @@ app.set("view engine", "html");
 
 
 // view engine setup
-app.use(cors("http://localhost:4200/"));
+app.use(cors("http://localhost:3000/"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
