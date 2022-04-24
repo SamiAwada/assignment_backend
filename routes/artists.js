@@ -53,7 +53,6 @@ router.get("/uniquesearches", async (req, res) => {
   const searchText = req.query.searchText;
   const page = pagevalue;
   const startIndex = page * 5;
-  console.log("req.query:", req.query);
   try {
     await mongo.open();
     let docs = await ArtistsSearchResult.aggregate([
@@ -73,20 +72,8 @@ router.get("/uniquesearches", async (req, res) => {
           "artistsnb": { "$size": "$searchResult" },
         },
       },
-      // {
-      //   "$project": {
-      //     "artists": {"a":"$artists"},
-      //     "searches": "$searches",
-      //     "artistsnb": {"$size": "$searchResult"}
-      //   }
-      // }
     ]);
-    console.log("docs:", docs);
-    docs[0].artists.map((ele) => {
-      return console.log("ele: ", ele);
-    });
     res.send(docs);
-    // console.log("docs.searchResult:", docs[0].searchResult.map(ele => return cos));
     mongo.close();
   } catch (error) {
     console.log(error);
