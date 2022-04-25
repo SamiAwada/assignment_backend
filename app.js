@@ -1,9 +1,8 @@
 var express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-var path = require("path");
 var indexRouter = require("./routes/artists");
-
+require("dotenv").config();
 var app = express();
 app.set("view engine", "html");
 
